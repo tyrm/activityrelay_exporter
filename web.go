@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"text/template"
 )
@@ -53,7 +54,7 @@ activitypub_delivery_codes_per_domain{relay="{{ $relay }}",instance="{{ $instanc
 # TYPE activitypub_exceptions counter
 {{- range $relay, $stats := . }}
 {{- range $error, $exceptions := $stats.Exceptions }}
-activitypub_exceptions{relay="{{ $relay }}",error="{{ $error }}"} {{ $exceptions }}
+activitypub_exceptions{relay="{{ $relay }}",error={{ $error | escape }}}} {{ $exceptions }}
 {{- end }}
 {{- end }}
 
@@ -62,7 +63,7 @@ activitypub_exceptions{relay="{{ $relay }}",error="{{ $error }}"} {{ $exceptions
 {{- range $relay, $stats := . }}
 {{- range $instance, $exceptionList := $stats.ExceptionsPerDomain }}
 {{- range $error, $exceptions := $exceptionList }}
-activitypub_exceptions_per_domain{relay="{{ $relay }}",instance="{{ $instance }}",error="{{ $error }}"} {{ $exceptions }}
+activitypub_exceptions_per_domain{relay="{{ $relay }}",instance="{{ $instance }}",error={{ $error | escape }}}} {{ $exceptions }}
 {{- end }}
 {{- end }}
 {{- end }}
@@ -71,7 +72,7 @@ activitypub_exceptions_per_domain{relay="{{ $relay }}",instance="{{ $instance }}
 # TYPE activitypub_delivery_exceptions counter
 {{- range $relay, $stats := . }}
 {{- range $error, $exceptions := $stats.DeliveryExceptions }}
-activitypub_delivery_exceptions{relay="{{ $relay }}",error="{{ $error }}"} {{ $exceptions }}
+activitypub_delivery_exceptions{relay="{{ $relay }}",error={{ $error | escape }}}} {{ $exceptions }}
 {{- end }}
 {{- end }}
 
@@ -80,17 +81,21 @@ activitypub_delivery_exceptions{relay="{{ $relay }}",error="{{ $error }}"} {{ $e
 {{- range $relay, $stats := . }}
 {{- range $instance, $exceptionList := $stats.DeliveryExceptionsPerDomain }}
 {{- range $error, $exceptions := $exceptionList }}
-activitypub_delivery_exceptions_per_domain{relay="{{ $relay }}",instance="{{ $instance }}",error="{{ $error }}"} {{ $exceptions }}
+activitypub_delivery_exceptions_per_domain{relay="{{ $relay }}",instance="{{ $instance }}",error={{ $error | escape }}} {{ $exceptions }}
 {{- end }}
 {{- end }}
 {{- end }}
 `
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	t := template.Must(template.New("metrics").Parse(templateMetrics))
+	t := template.Must(template.New("metrics").Funcs(template.FuncMap{
+		"escape": func(str string) string {
+			return fmt.Sprintf("%q", str)
+		},
+	}).Parse(templateMetrics))
 
 	err := t.Execute(w, relays.Get())
-	if err !=nil {
+	if err != nil {
 		logger.Errorf("Error processing template: %s", err.Error())
 	}
 }
