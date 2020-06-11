@@ -54,7 +54,7 @@ activitypub_delivery_codes_per_domain{relay="{{ $relay }}",instance="{{ $instanc
 # TYPE activitypub_exceptions counter
 {{- range $relay, $stats := . }}
 {{- range $error, $exceptions := $stats.Exceptions }}
-activitypub_exceptions{relay="{{ $relay }}",error={{ $error | escape }}}} {{ $exceptions }}
+activitypub_exceptions{relay="{{ $relay }}",error="{{ $error | html }}"} {{ $exceptions }}
 {{- end }}
 {{- end }}
 
@@ -63,7 +63,7 @@ activitypub_exceptions{relay="{{ $relay }}",error={{ $error | escape }}}} {{ $ex
 {{- range $relay, $stats := . }}
 {{- range $instance, $exceptionList := $stats.ExceptionsPerDomain }}
 {{- range $error, $exceptions := $exceptionList }}
-activitypub_exceptions_per_domain{relay="{{ $relay }}",instance="{{ $instance }}",error={{ $error | escape }}}} {{ $exceptions }}
+activitypub_exceptions_per_domain{relay="{{ $relay }}",instance="{{ $instance }}",error="{{ $error | html }}"} {{ $exceptions }}
 {{- end }}
 {{- end }}
 {{- end }}
@@ -72,7 +72,7 @@ activitypub_exceptions_per_domain{relay="{{ $relay }}",instance="{{ $instance }}
 # TYPE activitypub_delivery_exceptions counter
 {{- range $relay, $stats := . }}
 {{- range $error, $exceptions := $stats.DeliveryExceptions }}
-activitypub_delivery_exceptions{relay="{{ $relay }}",error={{ $error | escape }}}} {{ $exceptions }}
+activitypub_delivery_exceptions{relay="{{ $relay }}",error="{{ $error | html }}"} {{ $exceptions }}
 {{- end }}
 {{- end }}
 
@@ -81,7 +81,7 @@ activitypub_delivery_exceptions{relay="{{ $relay }}",error={{ $error | escape }}
 {{- range $relay, $stats := . }}
 {{- range $instance, $exceptionList := $stats.DeliveryExceptionsPerDomain }}
 {{- range $error, $exceptions := $exceptionList }}
-activitypub_delivery_exceptions_per_domain{relay="{{ $relay }}",instance="{{ $instance }}",error={{ $error | escape }}} {{ $exceptions }}
+activitypub_delivery_exceptions_per_domain{relay="{{ $relay }}",instance="{{ $instance }}",error="{{ $error | html }}"} {{ $exceptions }}
 {{- end }}
 {{- end }}
 {{- end }}
